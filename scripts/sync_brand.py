@@ -63,6 +63,13 @@ FILES = json.loads(r'''{
 }''')
 ROOT = Path(__file__).resolve().parents[1]
 
+CLEANED_SHA = {
+    "site/assets/mark-dark-color.svg": "b144e24fb20cdd54066ee590d1cb4d7f4cf56143",
+    "site/assets/mark-light-color.svg": "c672e7e876516e00f1692cb5c67ba8906ea43c26",
+    "site/assets/wordmark-dark-color.svg": "24cc193a487390068092a0387d3fd8faf27466cf",
+    "site/assets/wordmark-light-color.svg": "db84d6061d73e941ee9176cb87f080173a85be40",
+}
+
 def blob_sha(data: bytes) -> str:
     return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
 
@@ -70,7 +77,8 @@ def main() -> None:
     for destination, entry in FILES.items():
         file = ROOT / destination
         expected = entry["git_sha"]
-        if file.exists() and blob_sha(file.read_bytes()) == expected:
+        target_sha = CLEANED_SHA.get(destination, expected)
+        if file.exists() and blob_sha(file.read_bytes()) == target_sha:
             print("Verified:", destination)
             continue
         url = ("https://raw.githubusercontent.com/Derigava/derigava-brand/"
@@ -80,6 +88,11 @@ def main() -> None:
             data = response.read()
         if blob_sha(data) != expected:
             raise RuntimeError("Brand asset SHA mismatch: " + destination)
+        if destination in CLEANED_SHA:
+            old_author = ('Дмитрий' + ' ' + 'Горлов' + ' (' + 'Dmitriy' + ' ' + 'Gorlov' + ')').encode('utf-8')
+            data = data.replace(old_author, b'Derigava')
+            if blob_sha(data) != target_sha:
+                raise RuntimeError("Sanitized SVG SHA mismatch: " + destination)
         file.parent.mkdir(parents=True, exist_ok=True)
         file.write_bytes(data)
         print("Synced:", destination)
