@@ -43,7 +43,7 @@ GitHub Actions `.github/workflows/pages.yml` при push в `main` запуск�
 
 ## Происхождение и права
 
-Знак, палитра и оформление: © 2026 Дмитрий Горлов, [Derigava visual system](https://github.com/Derigava/derigava-brand) и её [условия](https://github.com/Derigava/derigava-brand/blob/main/LICENSE.md). Это использование владельцем в собственном проекте, а не отдельная лицензия на фирменные материалы.
+Знак, палитра и оформление: © 2026 Derigava, [Derigava visual system](https://github.com/Derigava/derigava-brand) и её [условия](https://github.com/Derigava/derigava-brand/blob/main/LICENSE.md). Это использование владельцем в собственном проекте, а не отдельная лицензия на фирменные материалы.
 
 Шрифты Unbounded, Onest и JetBrains Mono распространяются по SIL Open Font License 1.1; уведомления копируются в `site/assets/fonts/` вместе с ними при сборке.
 
