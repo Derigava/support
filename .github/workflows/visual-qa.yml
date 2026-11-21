@@ -1,0 +1,33 @@
+name: Visual browser QA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Sync official brand fonts and SVG
+        run: python3 scripts/sync_brand.py
+      - name: Install browser test tools
+        run: |
+          python3 -m pip install playwright==1.56.0
+          python3 -m playwright install chromium
+      - name: Test all breakpoints and save screenshots
+        run: python3 scripts/visual_check.py
+      - name: Upload Terminal and Paper screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: derigava-support-screenshots
+          path: screenshots/
+          if-no-files-found: warn
