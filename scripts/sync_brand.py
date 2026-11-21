@@ -6,7 +6,7 @@ from pathlib import Path
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
-BRAND_COMMIT = "d80c52994685f11c9eaa456ffd88f83edf718c77"
+BRAND_COMMIT = "73c06b7628e85ec3924a6d1cbae5707f5dcae8e3"
 FILES = json.loads(r'''{
   "site/assets/fonts/Onest-Variable.ttf": {
     "source": "00 Основа/assets/fonts/Onest-Variable.ttf",
@@ -38,23 +38,23 @@ FILES = json.loads(r'''{
   },
   "site/assets/mark-dark-color.png": {
     "source": "00 Основа/logos/mark-dark-color.png",
-    "git_sha": "43b2eef18e3801d4212c408a8a4eb4e244c62c1c"
+    "git_sha": "b420a8708ab13581851d089a4c2b577138191c8e"
   },
   "site/assets/mark-dark-color.svg": {
     "source": "00 Основа/logos/mark-dark-color.svg",
-    "git_sha": "f5460005320d8bba244bcbab11528ff735e1620c"
+    "git_sha": "b144e24fb20cdd54066ee590d1cb4d7f4cf56143"
   },
   "site/assets/mark-light-color.svg": {
     "source": "00 Основа/logos/mark-light-color.svg",
-    "git_sha": "f986acefedb8c1b49a67ff98f11f9e4257eb32d5"
+    "git_sha": "c672e7e876516e00f1692cb5c67ba8906ea43c26"
   },
   "site/assets/wordmark-dark-color.svg": {
     "source": "00 Основа/logos/wordmark-dark-color.svg",
-    "git_sha": "1262c452ad064e2c9cd2eb648dfc5a23ba4a1b1b"
+    "git_sha": "24cc193a487390068092a0387d3fd8faf27466cf"
   },
   "site/assets/wordmark-light-color.svg": {
     "source": "00 Основа/logos/wordmark-light-color.svg",
-    "git_sha": "1359ca793fcdd50973b7e45c17b759f22ab3edcf"
+    "git_sha": "db84d6061d73e941ee9176cb87f080173a85be40"
   },
   "site/tokens.css": {
     "source": "04 Управление и продажи/Командный кит/source/tokens.css",
@@ -63,13 +63,6 @@ FILES = json.loads(r'''{
 }''')
 ROOT = Path(__file__).resolve().parents[1]
 
-CLEANED_SHA = {
-    "site/assets/mark-dark-color.svg": "b144e24fb20cdd54066ee590d1cb4d7f4cf56143",
-    "site/assets/mark-light-color.svg": "c672e7e876516e00f1692cb5c67ba8906ea43c26",
-    "site/assets/wordmark-dark-color.svg": "24cc193a487390068092a0387d3fd8faf27466cf",
-    "site/assets/wordmark-light-color.svg": "db84d6061d73e941ee9176cb87f080173a85be40",
-}
-
 def blob_sha(data: bytes) -> str:
     return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
 
@@ -77,8 +70,7 @@ def main() -> None:
     for destination, entry in FILES.items():
         file = ROOT / destination
         expected = entry["git_sha"]
-        target_sha = CLEANED_SHA.get(destination, expected)
-        if file.exists() and blob_sha(file.read_bytes()) == target_sha:
+        if file.exists() and blob_sha(file.read_bytes()) == expected:
             print("Verified:", destination)
             continue
         url = ("https://raw.githubusercontent.com/Derigava/derigava-brand/"
@@ -88,11 +80,6 @@ def main() -> None:
             data = response.read()
         if blob_sha(data) != expected:
             raise RuntimeError("Brand asset SHA mismatch: " + destination)
-        if destination in CLEANED_SHA:
-            old_author = ('Дмитрий' + ' ' + 'Горлов' + ' (' + 'Dmitriy' + ' ' + 'Gorlov' + ')').encode('utf-8')
-            data = data.replace(old_author, b'Derigava')
-            if blob_sha(data) != target_sha:
-                raise RuntimeError("Sanitized SVG SHA mismatch: " + destination)
         file.parent.mkdir(parents=True, exist_ok=True)
         file.write_bytes(data)
         print("Synced:", destination)
