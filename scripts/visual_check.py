@@ -37,7 +37,10 @@ def main():
                 page.evaluate("document.fonts.ready")
                 assert page.locator("h1").is_visible(), "No hero at " + str(width)
                 assert page.locator("#project-list article").count() >= 1, "No projects"
-                assert page.locator(".empty-state").is_visible(), "Missing empty support state"
+                boosty = page.locator("#support-methods a.method-link")
+                assert boosty.count() == 1, "Expected one active support method"
+                assert boosty.get_attribute("href") == "https://boosty.to/derigava", "Incorrect Boosty URL"
+                assert boosty.get_attribute("target") == "_blank", "Boosty link must open in a new tab"
                 assert page.locator("html").get_attribute("data-theme") == "dark", "Terminal not default"
                 overflow = page.evaluate("document.documentElement.scrollWidth - window.innerWidth")
                 assert overflow <= 1, "Horizontal overflow at " + str(width) + "px: " + str(overflow)
@@ -52,6 +55,7 @@ def main():
                     page.reload(wait_until="networkidle")
                     assert page.locator("html").get_attribute("data-theme") == "light", "Theme preference not persisted"
                     assert page.locator("html").get_attribute("lang") == "en", "Language preference not persisted"
+                    assert page.locator("#support-methods a.method-link").get_attribute("href") == "https://boosty.to/derigava", "Boosty link lost after language switch"
                     page.screenshot(path=str(OUT / ("paper-" + name + ".png")), full_page=True)
                 context.close()
                 print("PASS viewport:", width)
