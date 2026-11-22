@@ -22,6 +22,8 @@ for (const item of projects) {
   for (const link of item.links) assert(new URL(link.url).protocol === "https:", "HTTPS project links");
 }
 assert(new Set(supportMethods.map(x => x.id)).size === supportMethods.length, "Unique support IDs");
+assert(supportMethods.some(x => x.id === "boosty" && x.enabled && x.url === "https://boosty.to/derigava"), "Boosty support link should be enabled");
+assert(page.includes('href="https://boosty.to/derigava"'), "Boosty fallback link should be present in HTML");
 for (const item of supportMethods) {
   assert(item.id && item.label && typeof item.enabled === "boolean", "Complete support method");
   if (item.enabled) assert(new URL(item.url).protocol === "https:", "HTTPS payment link");
